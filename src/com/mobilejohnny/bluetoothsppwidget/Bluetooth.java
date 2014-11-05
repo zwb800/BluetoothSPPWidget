@@ -33,7 +33,6 @@ public class Bluetooth {
 
     public Bluetooth(String deviceName)
     {
-
         device =  findDeviceByName(deviceName);
     }
 
@@ -42,8 +41,10 @@ public class Bluetooth {
         @Override
         protected  Integer doInBackground(Object[] handler) {
             int result = RESULT_FAILD;
-            if(handler!=null&&handler.length>0){
-                cHandler = (BluetoothHandler)handler[0];
+            String data = null;
+            if(handler!=null&&handler.length>1){
+                data = (String) handler[0];
+                cHandler = (BluetoothHandler)handler[1];
             }
 
             connectSocket();
@@ -51,7 +52,9 @@ public class Bluetooth {
             {
                 try {
                     OutputStream out = socket.getOutputStream();
-                    out.write('1');
+                    for (int i = 0; i < data.length(); i++) {
+                        out.write(data.charAt(i));
+                    }
                     out.flush();
                     result = RESULT_SUCCESS;
                 } catch (IOException e) {
@@ -74,7 +77,7 @@ public class Bluetooth {
 
 
 
-    public void connect(BluetoothHandler handler) {
+    public void connect(String data,BluetoothHandler handler) {
 
         if(!adapter.isEnabled()){
             handler.result(RESULT_BLUETOOTH_DISABLED);
@@ -82,11 +85,12 @@ public class Bluetooth {
         }
         else if(device!=null){
             Log.i("BT","已找到绑定设备");
-            createSocket();
+            createSocket2();
 
             if(socket!=null)
             {
-                task.execute(handler);
+
+                task.execute(data,handler);
             }
         }
         else
@@ -125,6 +129,7 @@ public class Bluetooth {
     private void connectSocket() {
         boolean faild = false;
         try {
+            Log.i("BT","开始连接");
             socket.connect();
             Log.i("BT","已连接");
         } catch (IOException e) {
@@ -167,5 +172,6 @@ public class Bluetooth {
 
     public static Set<BluetoothDevice> getBondedDevices() {
         return adapter.getBondedDevices();
+
     }
 }

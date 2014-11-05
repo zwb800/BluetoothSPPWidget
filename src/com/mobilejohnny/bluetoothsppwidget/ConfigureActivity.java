@@ -7,15 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 
 public class ConfigureActivity extends Activity {
 
-    private int appWidgetid;
     private TextView txtLabel;
+    private TextView txtData;
 
     /**
      * Called when the activity is first created.
@@ -25,31 +23,41 @@ public class ConfigureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configure);
 
-        Intent intent = getIntent();
-        appWidgetid = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID);
-
         txtLabel = (TextView)findViewById(R.id.txtLabel);
+        txtData = (TextView)findViewById(R.id.txtData);
+
+
         Button btnDone = (Button) findViewById(R.id.btnDone);
         setResult(RESULT_CANCELED);
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String label = txtLabel.getText().toString();
-                Pref.set(ConfigureActivity.this,appWidgetid,label, null);
-
-                WidgetProvider.updateWidget(ConfigureActivity.this,
-                        appWidgetid, label);
-                done(appWidgetid);
+                done();
             }
         });
 
     }
 
-    private void done(int appWidgetid) {
+    private void done() {
+
+        if(txtLabel.getText().length()==0)
+        {
+            txtLabel.setError("请输入按钮文本");
+            return;
+        }
+
+        if(txtData.getText().length()==0)
+        {
+            txtData.setError("请输入数据");
+            return;
+        }
+
         Intent resultValue = new Intent();
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetid);
+        resultValue.putExtra("label",txtLabel.getText().toString());
+        resultValue.putExtra("data",txtData.getText().toString());
         setResult(RESULT_OK, resultValue);
         finish();
     }
+
 }

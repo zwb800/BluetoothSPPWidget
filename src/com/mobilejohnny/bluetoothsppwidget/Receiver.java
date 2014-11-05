@@ -12,10 +12,10 @@ import android.widget.Toast;
  */
 public class Receiver extends BroadcastReceiver {
     private String deviceName;
+    private String data;
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.i("intent",intent.getAction());
         SharedPreferences pref = context.getSharedPreferences("Default", 0);
 
         final int id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -23,13 +23,13 @@ public class Receiver extends BroadcastReceiver {
         final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         deviceName = Pref.getDeviceName(context,id);
-
+        data = Pref.getData(context,id);
         if(deviceName!=null)
         {
             showProssing(id, views, appWidgetManager);
 
             Bluetooth bluetooth = new Bluetooth(deviceName);
-            bluetooth.connect(new BluetoothHandler() {
+            bluetooth.connect(data,new BluetoothHandler() {
                 @Override
                 public void result(int result) {
                     hideProcessing(views, appWidgetManager, id);
@@ -71,6 +71,6 @@ public class Receiver extends BroadcastReceiver {
     private void hideProcessing(RemoteViews views, AppWidgetManager appWidgetManager, int id) {
         views.setViewVisibility(R.id.button, View.VISIBLE);
         views.setViewVisibility(R.id.progressBar,View.GONE);
-        appWidgetManager.updateAppWidget(id,views);
+        appWidgetManager.updateAppWidget(id, views);
     }
 }

@@ -15,7 +15,6 @@ import android.widget.RemoteViews;
 public class WidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_SWITCH = "com.mobilejohnny.bluetoothsppwidget.action.SWITCH";
-    public static final String EXTRA_DEVICE_NAME = "DEVICE_NAME";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

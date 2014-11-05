@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BluetoothSPPWidget</string>
-    <string name="widget_name">BT Button</string>
+    <string name="app_name">蓝牙串行小工具</string>
+    <string name="widget_name">蓝牙串行按钮</string>
+    <string name="BoundedDeviceList">已配对设备</string>
+    <string name="ConfigButton">配置按钮</string>
 </resources>

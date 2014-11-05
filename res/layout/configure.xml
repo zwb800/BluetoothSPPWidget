@@ -3,20 +3,29 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-        >
+              android:padding="10dp">
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button Label:"
+            android:text="按钮文字:"
             android:id="@+id/textView"/>
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/txtLabel"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发送数据:"
+            android:id="@+id/textView2"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtData" android:autoText="false"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Done"
+            android:text="完成"
             android:id="@+id/btnDone" android:layout_gravity="center_horizontal"/>
 </LinearLayout>
 

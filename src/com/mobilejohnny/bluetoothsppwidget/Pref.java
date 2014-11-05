@@ -7,11 +7,12 @@ import android.content.SharedPreferences;
  * Created by admin2 on 2014/11/5.
  */
 public class Pref {
-    public static void set(Context context,int appWidgetid,String label, String deviceName) {
+    public static void set(Context context,int appWidgetid,String label, String deviceName,String data) {
         SharedPreferences pref = getPref(context);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("dev"+appWidgetid,deviceName);
         editor.putString("label"+appWidgetid,label);
+        editor.putString("data"+appWidgetid,data);
         editor.commit();
     }
 
@@ -40,6 +41,11 @@ public class Pref {
     {
         return getString(context,appWidgetid,"label","error");
     }
+    public static String getData(Context context,int appWidgetid)
+    {
+        return getString(context,appWidgetid,"data",null);
+    }
+
     public static String getString(Context context,int appWidgetid,String prefix,String notfoundvalue)
     {
         SharedPreferences pref = getPref(context);
