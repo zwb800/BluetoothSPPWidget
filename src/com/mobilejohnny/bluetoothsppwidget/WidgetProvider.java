@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.widget.RemoteViews;
 
 /**
@@ -13,19 +15,45 @@ import android.widget.RemoteViews;
 public class WidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_SWITCH = "com.mobilejohnny.bluetoothsppwidget.action.SWITCH";
+    public static final String EXTRA_DEVICE_NAME = "DEVICE_NAME";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+
         for (int i = 0; i < appWidgetIds.length; i++) {
             int id = appWidgetIds[i];
-
-            RemoteViews views = new RemoteViews(context.getPackageName(),R.layout.widget);
-            Intent intent = new Intent(ACTION_SWITCH);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.button,pendingIntent);
-            appWidgetManager.updateAppWidget(id,views);
+            String label = Pref.getLabel(context,id);
+            updateWidget(context, appWidgetManager, id, label);
         }
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+        onUpdate(context,appWidgetManager,new int[]{appWidgetId});
+
+    }
+
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        super.onDeleted(context, appWidgetIds);
+        Pref.removeAll(context, appWidgetIds);
+    }
+
+    public static void updateWidget(Context context,AppWidgetManager appWidgetManager,int appWidgetid,String label) {
+        RemoteViews views = new RemoteViews(context.getPackageName(),
+                R.layout.widget);
+        Intent intent = new Intent(WidgetProvider.ACTION_SWITCH);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,appWidgetid);
+        int requestcode = appWidgetid;//这里requestcode用于区分各intent 而不是intent对象
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestcode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.button,pendingIntent);
+        views.setTextViewText(R.id.button,label);
+        appWidgetManager.updateAppWidget(appWidgetid, views);
+    }
+
+    public static void updateWidget(Context context,int appWidgetid,String label) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        updateWidget(context,appWidgetManager,appWidgetid,label);
     }
 }

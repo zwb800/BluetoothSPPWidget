@@ -4,7 +4,9 @@ import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,15 +20,32 @@ import java.util.UUID;
  * Created by zwb08_000 on 2014/11/4.
  */
 public class Bluetooth {
-    private final BluetoothDevice device;
-    private BluetoothAdapter adapter;
+    public static final int RESULT_DEVICE_NOTFOUND = 1;
+    public static final int RESULT_FAILD = 2;
+    public static final int RESULT_SUCCESS = 3;
+    public static final int RESULT_BLUETOOTH_DISABLED = 4;
+
+    private BluetoothDevice device;
+    private static BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothSocket socket;
 
     final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    AsyncTask task = new AsyncTask() {
+    public Bluetooth(String deviceName)
+    {
+
+        device =  findDeviceByName(deviceName);
+    }
+
+    AsyncTask<Object,Void,Integer> task = new AsyncTask<Object,Void,Integer>() {
+        BluetoothHandler cHandler;
         @Override
-        protected Object doInBackground(Object[] objects) {
+        protected  Integer doInBackground(Object[] handler) {
+            int result = RESULT_FAILD;
+            if(handler!=null&&handler.length>0){
+                cHandler = (BluetoothHandler)handler[0];
+            }
+
             connectSocket();
             if(socket.isConnected())
             {
@@ -34,46 +53,55 @@ public class Bluetooth {
                     OutputStream out = socket.getOutputStream();
                     out.write('1');
                     out.flush();
+                    result = RESULT_SUCCESS;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            return objects[0];
+            closeSocket();
+
+            return result;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            BluetoothHandler handler = (BluetoothHandler) o;
-            handler.result(socket.isConnected());
-            closeSocket();
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            if(cHandler!=null){
+                cHandler.result(result);
+            }
         }
     };
 
-    public Bluetooth()
-    {
-        adapter = BluetoothAdapter.getDefaultAdapter();
 
-        device =  findDeviceByName("BTCOM");
-
-
-
-    }
 
     public void connect(BluetoothHandler handler) {
 
-        createSocket();
-
-        if(socket!=null)
-        {
-            task.execute(handler);
+        if(!adapter.isEnabled()){
+            handler.result(RESULT_BLUETOOTH_DISABLED);
+            Log.i("BT","未找到绑定设备");
         }
+        else if(device!=null){
+            Log.i("BT","已找到绑定设备");
+            createSocket();
+
+            if(socket!=null)
+            {
+                task.execute(handler);
+            }
+        }
+        else
+        {
+            handler.result(RESULT_DEVICE_NOTFOUND);
+            Log.i("BT","未找到绑定设备");
+        }
+
     }
 
-    private void createSocket() {
+    private void createSocket2() {
         try {
             Method m = device.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
             socket = (BluetoothSocket) m.invoke(device, 1);
+            Log.i("BT","已创建SOCKET2");
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
@@ -83,12 +111,34 @@ public class Bluetooth {
         }
     }
 
-    private void connectSocket() {
+    private void createSocket() {
         try {
-            socket.connect();
+            socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
+            Log.i("BT","已创建SOCKET");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    boolean tryotherway =  true;
+    private void connectSocket() {
+        boolean faild = false;
+        try {
+            socket.connect();
+            Log.i("BT","已连接");
+        } catch (IOException e) {
+            e.printStackTrace();
+            faild = true;
+        }
+
+//        if(faild&&tryotherway){
+//            tryotherway = false;
+//            Log.i("BT","尝试另一种方法");
+//            closeSocket();
+//            createSocket2();
+//            connectSocket();
+//        }
     }
 
     private void closeSocket() {
@@ -115,9 +165,7 @@ public class Bluetooth {
         return device;
     }
 
-    private Set<BluetoothDevice> getBondedDevices() {
+    public static Set<BluetoothDevice> getBondedDevices() {
         return adapter.getBondedDevices();
     }
-
-
 }

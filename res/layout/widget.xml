@@ -7,7 +7,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:text="Light"
+            android:text="BTButton"
             android:id="@+id/button" android:layout_alignParentTop="true" android:layout_alignParentRight="true"
             />
     <ProgressBar

@@ -7,4 +7,5 @@
        android:initialLayout="@layout/widget"
        android:widgetCategory="home_screen|keyguard"
        android:previewImage="@drawable/ic_launcher"
+       android:configure="com.mobilejohnny.bluetoothsppwidget.DeviceList"
         />
