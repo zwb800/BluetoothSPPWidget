@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">蓝牙串行小工具</string>
-    <string name="widget_name">蓝牙串行按钮</string>
-    <string name="BoundedDeviceList">已配对设备</string>
-    <string name="ConfigButton">配置按钮</string>
+    <string name="app_name">Bluetooth SPP Widget</string>
+    <string name="widget_name">BT SPP Button</string>
+    <string name="BoundedDeviceList">Paired Devices</string>
+    <string name="ConfigButton">Setting a Button</string>
+    <string name="done">Done</string>
+    <string name="senddata">Send Data</string>
+    <string name="buttonlabel">Button Label</string>
+    <string name="toast_failed">Failed</string>
+    <string name="toast_success">Success</string>
+    <string name="toast_devicenotfound">Bluetooth Device \"{0}\" Not Found</string>
+    <string name="toast_enablebluetooth">Please Enable Bluetooth</string>
 </resources>

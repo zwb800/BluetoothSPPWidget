@@ -6,6 +6,6 @@
        android:resizeMode="none"
        android:initialLayout="@layout/widget"
        android:widgetCategory="home_screen|keyguard"
-       android:previewImage="@drawable/ic_launcher"
+       android:previewImage="@drawable/bluetooth_icon"
        android:configure="com.mobilejohnny.bluetoothsppwidget.DeviceListActivity"
         />

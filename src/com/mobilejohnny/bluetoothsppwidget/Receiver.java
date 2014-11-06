@@ -45,19 +45,19 @@ public class Receiver extends BroadcastReceiver {
         String msg = "";
         if(result== Bluetooth.RESULT_FAILD)
         {
-            msg = "失败";
+            msg = context.getString(R.string.toast_failed);
         }
         else if(result== Bluetooth.RESULT_SUCCESS)
         {
-            msg = "成功";
+            msg = context.getString(R.string.toast_success);
         }
         else if(result== Bluetooth.RESULT_DEVICE_NOTFOUND)
         {
-            msg = "蓝牙设备\""+deviceName+"\"未找到";
+            msg = context.getString(R.string.toast_devicenotfound).replace("{0}",deviceName);
         }
         else if(result== Bluetooth.RESULT_BLUETOOTH_DISABLED)
         {
-            msg = "请先开启蓝牙";
+            msg = context.getString(R.string.toast_enablebluetooth);
         }
 
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

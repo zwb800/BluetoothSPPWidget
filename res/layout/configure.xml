@@ -7,7 +7,7 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="按钮文字:"
+            android:text="@string/buttonlabel"
             android:id="@+id/textView"/>
     <EditText
             android:layout_width="match_parent"
@@ -16,7 +16,7 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发送数据:"
+            android:text="@string/senddata"
             android:id="@+id/textView2"/>
     <EditText
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="完成"
-            android:id="@+id/btnDone" android:layout_gravity="center_horizontal"/>
+            android:text="@string/done"
+            android:id="@+id/btnDone" android:layout_gravity="center_horizontal" android:singleLine="false"/>
 </LinearLayout>
 

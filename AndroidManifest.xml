@@ -13,7 +13,6 @@
         </activity>
         <activity android:name=".ConfigureActivity" android:theme="@android:style/Theme.DeviceDefault.Dialog"  android:windowSoftInputMode="stateVisible"
                   android:label="@string/ConfigButton">
-
         </activity>
         <receiver android:name=".WidgetProvider" android:label="@string/widget_name">
             <intent-filter>

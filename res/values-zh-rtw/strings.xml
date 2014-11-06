@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">藍牙串行小工具</string>
+    <string name="widget_name">藍牙串行按鈕</string>
+    <string name="BoundedDeviceList">已配對設備</string>
+    <string name="ConfigButton">配置按鈕</string>
+    <string name="done">完成</string>
+    <string name="senddata">發送數據</string>
+    <string name="buttonlabel">按鈕文本</string>
+    <string name="toast_failed">失敗</string>
+    <string name="toast_success">成功</string>
+    <string name="toast_devicenotfound">藍牙設備\"{0}\"未找到</string>
+    <string name="toast_enablebluetooth">請先開啟藍牙</string>
+</resources>
