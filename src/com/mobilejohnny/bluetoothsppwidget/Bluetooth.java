@@ -5,7 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.ParcelUuid;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,8 +33,10 @@ public class Bluetooth {
     private BluetoothSocket socket;
 
 
+
     final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothListener listener;
+
 
     public Bluetooth(String deviceName)
     {
@@ -47,7 +52,6 @@ public class Bluetooth {
                 data = (String) handler[0];
             }
 
-
             if(connectSocket()&&socket.isConnected())
             {
                 try {
@@ -56,6 +60,7 @@ public class Bluetooth {
                         out.write(data.charAt(i));
                     }
                     out.flush();
+                    out.close();
                     result = RESULT_SUCCESS;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -68,9 +73,38 @@ public class Bluetooth {
 
         @Override
         protected void onPostExecute(Integer result) {
+            timeouttask.cancel(true);
             super.onPostExecute(result);
             if(listener!=null){
                 listener.result(result);
+                listener = null;
+            }
+
+        }
+    };
+
+    private AsyncTask<Object, Object, Void> timeouttask = new AsyncTask<Object,Object,Void>(){
+
+        @Override
+        protected Void doInBackground(Object... objects) {
+            try {
+                Thread.sleep(12000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if(listener!=null)
+            {
+                task.cancel(true);
+                listener.result(RESULT_FAILD);
+                listener = null;
+                Log.i("BT","连接超时");
             }
         }
     };
@@ -93,6 +127,7 @@ public class Bluetooth {
             if(socket!=null)
             {
                 task.execute(data);
+                timeouttask.execute();
             }
             else
             {
@@ -110,16 +145,14 @@ public class Bluetooth {
 
     private void createSocket() {
 
-        try {
-            if(SDK_VER>=10)
-            {
-                socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            }
-            else
-            {
-                socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
-            }
+        if(tryotherway)
+        {
+            createSocket2();
+            return;
+        }
 
+        try {
+               socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
             Log.i("BT","已创建SOCKET");
         } catch (IOException e) {
             e.printStackTrace();
@@ -143,7 +176,7 @@ public class Bluetooth {
 
 
 
-//    boolean tryotherway =  true;
+    private static boolean  tryotherway =  false;
     private Boolean connectSocket() {
         boolean success = false;
         if(adapter.isDiscovering())
@@ -158,17 +191,17 @@ public class Bluetooth {
             Log.i("BT","已连接");
         } catch (IOException e) {
             e.printStackTrace();
+            if((!tryotherway)&&e.getMessage().equals("Service discovery failed"))
+            {
+                tryotherway = true;
+                Log.i("BT","尝试另一种方法");
+                closeSocket();
+                createSocket();
+                return connectSocket();
+            }
         }
 
         return success;
-
-//        if(faild&&tryotherway){
-//            tryotherway = false;
-//            Log.i("BT","尝试另一种方法");
-//            closeSocket();
-//            createSocket2();
-//            connectSocket();
-//        }
     }
 
     private void closeSocket() {
