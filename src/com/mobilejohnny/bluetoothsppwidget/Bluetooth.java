@@ -1,11 +1,10 @@
 package com.mobilejohnny.bluetoothsppwidget;
 
-import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.IOException;
@@ -24,12 +23,15 @@ public class Bluetooth {
     public static final int RESULT_FAILD = 2;
     public static final int RESULT_SUCCESS = 3;
     public static final int RESULT_BLUETOOTH_DISABLED = 4;
+    public static final int SDK_VER = Build.VERSION.SDK_INT;
 
     private BluetoothDevice device;
     private static BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothSocket socket;
 
+
     final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private BluetoothListener listener;
 
     public Bluetooth(String deviceName)
     {
@@ -37,18 +39,16 @@ public class Bluetooth {
     }
 
     AsyncTask<Object,Void,Integer> task = new AsyncTask<Object,Void,Integer>() {
-        BluetoothHandler cHandler;
         @Override
         protected  Integer doInBackground(Object[] handler) {
             int result = RESULT_FAILD;
             String data = null;
-            if(handler!=null&&handler.length>1){
+            if(handler!=null&&handler.length>0){
                 data = (String) handler[0];
-                cHandler = (BluetoothHandler)handler[1];
             }
 
-            connectSocket();
-            if(socket.isConnected())
+
+            if(connectSocket()&&socket.isConnected())
             {
                 try {
                     OutputStream out = socket.getOutputStream();
@@ -69,34 +69,60 @@ public class Bluetooth {
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            if(cHandler!=null){
-                cHandler.result(result);
+            if(listener!=null){
+                listener.result(result);
             }
         }
     };
 
+    public void setListener(BluetoothListener listener)
+    {
+        this.listener = listener;
+    }
 
-
-    public void connect(String data,BluetoothHandler handler) {
+    public void connect(String data) {
 
         if(!adapter.isEnabled()){
-            handler.result(RESULT_BLUETOOTH_DISABLED);
+            listener.result(RESULT_BLUETOOTH_DISABLED);
             Log.i("BT","未找到绑定设备");
         }
         else if(device!=null){
             Log.i("BT","已找到绑定设备");
-            createSocket2();
+            createSocket();
 
             if(socket!=null)
             {
-
-                task.execute(data,handler);
+                task.execute(data);
+            }
+            else
+            {
+                listener.result(RESULT_FAILD);
+                Log.i("BT","SOCKET创建失败");
             }
         }
         else
         {
-            handler.result(RESULT_DEVICE_NOTFOUND);
-            Log.i("BT","未找到绑定设备");
+            listener.result(RESULT_DEVICE_NOTFOUND);
+            Log.i("BT", "未找到绑定设备");
+        }
+
+    }
+
+    private void createSocket() {
+
+        try {
+            if(SDK_VER>=10)
+            {
+                socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            }
+            else
+            {
+                socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
+            }
+
+            Log.i("BT","已创建SOCKET");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -115,27 +141,26 @@ public class Bluetooth {
         }
     }
 
-    private void createSocket() {
-        try {
-            socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
-            Log.i("BT","已创建SOCKET");
-        } catch (IOException e) {
-            e.printStackTrace();
+
+
+//    boolean tryotherway =  true;
+    private Boolean connectSocket() {
+        boolean success = false;
+        if(adapter.isDiscovering())
+        {
+            adapter.cancelDiscovery();
         }
 
-    }
-
-    boolean tryotherway =  true;
-    private void connectSocket() {
-        boolean faild = false;
         try {
             Log.i("BT","开始连接");
             socket.connect();
+            success = true;
             Log.i("BT","已连接");
         } catch (IOException e) {
             e.printStackTrace();
-            faild = true;
         }
+
+        return success;
 
 //        if(faild&&tryotherway){
 //            tryotherway = false;

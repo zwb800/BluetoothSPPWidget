@@ -2,7 +2,6 @@ package com.mobilejohnny.bluetoothsppwidget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.*;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -29,13 +28,15 @@ public class Receiver extends BroadcastReceiver {
             showProssing(id, views, appWidgetManager);
 
             Bluetooth bluetooth = new Bluetooth(deviceName);
-            bluetooth.connect(data,new BluetoothHandler() {
+            bluetooth.setListener(new BluetoothListener() {
                 @Override
                 public void result(int result) {
                     hideProcessing(views, appWidgetManager, id);
                     showToast(context,result );
                 }
             });
+
+            bluetooth.connect(data);
         }
 
     }
