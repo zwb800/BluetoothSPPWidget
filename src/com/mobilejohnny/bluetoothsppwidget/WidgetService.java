@@ -1,11 +1,13 @@
 package com.mobilejohnny.bluetoothsppwidget;
 
+import android.app.Notification;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -15,6 +17,7 @@ import android.widget.Toast;
  * Created by office on 2014/11/7.
  */
 public class WidgetService extends Service {
+    private static final int BT_NOTIFICATION_ID = 1;
     private String deviceName;
     private Context context;
 
@@ -24,9 +27,31 @@ public class WidgetService extends Service {
     }
 
     @Override
+    public void onDestroy() {
+        Log.i("Service","onDestroy");
+        super.onDestroy();
+        stopForeground(true);
+    }
+
+    @Override
+    public void onLowMemory() {
+        Log.i("Service","onLowMemory");
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Notification notification = new NotificationCompat.Builder(getApplicationContext()).
+                setContentTitle(getResources().getString(R.string.sending)).
+                setSmallIcon(R.drawable.bluetooth_icon).build();
+        startForeground(BT_NOTIFICATION_ID, notification);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("Service","执行服务");
         context = getApplicationContext();
+
 
         final int id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         final RemoteViews views = new RemoteViews(context.getPackageName(),R.layout.widget);
@@ -51,7 +76,7 @@ public class WidgetService extends Service {
             bluetooth.connect(data);
         }
 
-        return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void showToast( Context context,int result) {

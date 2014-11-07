@@ -11,4 +11,5 @@
     <string name="toast_success">Success</string>
     <string name="toast_devicenotfound">Bluetooth Device \"{0}\" Not Found</string>
     <string name="toast_enablebluetooth">Please Enable Bluetooth</string>
+    <string name="sending">Sending</string>
 </resources>

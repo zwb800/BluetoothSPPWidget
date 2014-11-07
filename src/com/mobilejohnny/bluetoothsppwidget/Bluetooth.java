@@ -46,13 +46,14 @@ public class Bluetooth {
     AsyncTask<Object,Void,Integer> task = new AsyncTask<Object,Void,Integer>() {
         @Override
         protected  Integer doInBackground(Object[] handler) {
+
             int result = RESULT_FAILD;
             String data = null;
             if(handler!=null&&handler.length>0){
                 data = (String) handler[0];
             }
 
-            if(connectSocket()&&socket.isConnected())
+            if(connectSocket())
             {
                 try {
                     OutputStream out = socket.getOutputStream();
@@ -67,16 +68,15 @@ public class Bluetooth {
                 }
             }
             closeSocket();
-
             return result;
         }
 
         @Override
         protected void onPostExecute(Integer result) {
+
             super.onPostExecute(result);
             if(listener!=null){
                 listener.result(result);
-                listener = null;
             }
 
         }

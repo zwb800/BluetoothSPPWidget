@@ -3,8 +3,9 @@
           package="com.mobilejohnny.bluetoothsppwidget"
           android:versionCode="3"
           android:versionName="1.02">
-    <uses-sdk android:minSdkVersion="14"/>
-    <application android:label="@string/app_name" android:icon="@drawable/bluetooth_icon">
+    <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="14"/>
+    <application android:label="@string/app_name"
+                 android:icon="@drawable/bluetooth_icon">
 
         <activity android:name=".DeviceListActivity" android:label="@string/BoundedDeviceList">
             <intent-filter>

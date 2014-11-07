@@ -11,4 +11,5 @@
     <string name="toast_success">成功</string>
     <string name="toast_devicenotfound">藍牙設備\"{0}\"未找到</string>
     <string name="toast_enablebluetooth">請先開啟藍牙</string>
+    <string name="sending">發送中</string>
 </resources>
