@@ -73,39 +73,12 @@ public class Bluetooth {
 
         @Override
         protected void onPostExecute(Integer result) {
-            timeouttask.cancel(true);
             super.onPostExecute(result);
             if(listener!=null){
                 listener.result(result);
                 listener = null;
             }
 
-        }
-    };
-
-    private AsyncTask<Object, Object, Void> timeouttask = new AsyncTask<Object,Object,Void>(){
-
-        @Override
-        protected Void doInBackground(Object... objects) {
-            try {
-                Thread.sleep(12000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if(listener!=null)
-            {
-                task.cancel(true);
-                listener.result(RESULT_FAILD);
-                listener = null;
-                Log.i("BT","连接超时");
-            }
         }
     };
 
@@ -127,7 +100,6 @@ public class Bluetooth {
             if(socket!=null)
             {
                 task.execute(data);
-                timeouttask.execute();
             }
             else
             {
@@ -191,13 +163,20 @@ public class Bluetooth {
             Log.i("BT","已连接");
         } catch (IOException e) {
             e.printStackTrace();
-            if((!tryotherway)&&e.getMessage().equals("Service discovery failed"))
+
+            if(!tryotherway)
             {
-                tryotherway = true;
-                Log.i("BT","尝试另一种方法");
-                closeSocket();
-                createSocket();
-                return connectSocket();
+                if(e.getMessage().equals("Service discovery failed")){
+                    tryotherway = true;
+                    Log.i("BT","尝试另一种方法");
+                    closeSocket();
+                    createSocket();
+                    return connectSocket();
+                }
+            }
+            else
+            {
+                tryotherway = false;
             }
         }
 

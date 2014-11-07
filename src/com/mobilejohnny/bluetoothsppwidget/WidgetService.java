@@ -1,44 +1,57 @@
 package com.mobilejohnny.bluetoothsppwidget;
 
+import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.content.*;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 /**
- * Created by zwb08_000 on 2014/11/4.
+ * Created by office on 2014/11/7.
  */
-public class Receiver extends BroadcastReceiver {
+public class WidgetService extends Service {
     private String deviceName;
-    private String data;
+    private Context context;
 
     @Override
-    public void onReceive(final Context context, Intent intent) {
-        SharedPreferences pref = context.getSharedPreferences("Default", 0);
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("Service","执行服务");
+        context = getApplicationContext();
 
         final int id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         final RemoteViews views = new RemoteViews(context.getPackageName(),R.layout.widget);
         final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         deviceName = Pref.getDeviceName(context,id);
-        data = Pref.getData(context,id);
+        String data = Pref.getData(context, id);
         if(deviceName!=null)
         {
-            showProssing(id, views, appWidgetManager);
+            showProcessing(id, views, appWidgetManager);
 
             Bluetooth bluetooth = new Bluetooth(deviceName);
             bluetooth.setListener(new BluetoothListener() {
                 @Override
                 public void result(int result) {
                     hideProcessing(views, appWidgetManager, id);
-                    showToast(context,result );
+                    showToast(context,result);
+                    WidgetService.this.stopSelf();
                 }
             });
 
             bluetooth.connect(data);
         }
 
+        return START_NOT_STICKY;
     }
 
     private void showToast( Context context,int result) {
@@ -63,7 +76,7 @@ public class Receiver extends BroadcastReceiver {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void showProssing(int id, RemoteViews views, AppWidgetManager appWidgetManager) {
+    private void showProcessing(int id, RemoteViews views, AppWidgetManager appWidgetManager) {
         views.setViewVisibility(R.id.button, View.GONE);
         views.setViewVisibility(R.id.progressBar,View.VISIBLE);
         appWidgetManager.updateAppWidget(id,views);

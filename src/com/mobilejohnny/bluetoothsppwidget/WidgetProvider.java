@@ -14,8 +14,6 @@ import android.widget.RemoteViews;
  */
 public class WidgetProvider extends AppWidgetProvider {
 
-    public static final String ACTION_SWITCH = "com.mobilejohnny.bluetoothsppwidget.action.SWITCH";
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
@@ -42,10 +40,12 @@ public class WidgetProvider extends AppWidgetProvider {
     public static void updateWidget(Context context,AppWidgetManager appWidgetManager,int appWidgetid,String label) {
         RemoteViews views = new RemoteViews(context.getPackageName(),
                 R.layout.widget);
-        Intent intent = new Intent(WidgetProvider.ACTION_SWITCH);
+
+        Intent intent = new Intent(context,WidgetService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,appWidgetid);
         int requestcode = appWidgetid;//这里requestcode用于区分各intent 而不是intent对象
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestcode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent pendingIntent = PendingIntent.getService(context,requestcode,intent,PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.button,pendingIntent);
         views.setTextViewText(R.id.button,label);
         appWidgetManager.updateAppWidget(appWidgetid, views);
