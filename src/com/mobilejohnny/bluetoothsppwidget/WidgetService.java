@@ -43,7 +43,8 @@ public class WidgetService extends Service {
     public void onCreate() {
         super.onCreate();
         Notification notification = new NotificationCompat.Builder(getApplicationContext()).
-                setContentTitle(getResources().getString(R.string.sending)).
+                setContentTitle(getResources().getString(R.string.app_name)).
+                setContentText(getResources().getString(R.string.sending)).
                 setSmallIcon(R.drawable.bluetooth_icon).build();
         startForeground(BT_NOTIFICATION_ID, notification);
     }

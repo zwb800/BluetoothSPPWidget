@@ -26,13 +26,12 @@ public class DeviceListActivity extends Activity {
         Set<BluetoothDevice> devices = Bluetooth.getBondedDevices();
 
         Iterator<BluetoothDevice> it = devices.iterator();
-        String[] devicesArr = new String[devices.size()];
 
         Intent intent = getIntent();
         appWidgetid = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID);
         setResult(RESULT_CANCELED);
 
-        ArrayList<Map<String,Object>> data = new ArrayList<Map<String, Object>>();
+        ArrayList<Map<String,String>> data = new ArrayList<Map<String, String>>();
 
         String[] from = new String[]{
                 "Name",
@@ -47,7 +46,7 @@ public class DeviceListActivity extends Activity {
         while (it.hasNext())
         {
             BluetoothDevice d = it.next();
-            Map<String,Object> map =  new HashMap<String, Object>();
+            Map<String,String> map =  new HashMap<String, String>();
             map.put(from[0],d.getName());
             map.put(from[1],d.getAddress());
             data.add(map);
