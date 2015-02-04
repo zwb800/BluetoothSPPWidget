@@ -1,5 +1,7 @@
 package com.mobilejohnny.bluetoothsppwidget;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -40,6 +42,7 @@ public class Bluetooth {
 
     public Bluetooth(String deviceName)
     {
+        adapter.startDiscovery();
         device =  findDeviceByName(deviceName);
     }
 
@@ -91,7 +94,7 @@ public class Bluetooth {
 
         if(!adapter.isEnabled()){
             listener.result(RESULT_BLUETOOTH_DISABLED);
-            Log.i("BT","未找到绑定设备");
+            Log.i("BT","蓝牙未启用");
         }
         else if(device!=null){
             Log.i("BT","已找到绑定设备");
@@ -115,6 +118,7 @@ public class Bluetooth {
 
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void createSocket() {
 
         if(tryotherway)
@@ -124,7 +128,14 @@ public class Bluetooth {
         }
 
         try {
-               socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
+
+            int sdk = Build.VERSION.SDK_INT;
+            if(sdk >= Build.VERSION_CODES.HONEYCOMB){
+                //sdk 2.3以上需要用此方法连接，否则连接不上，会报 java.io.IOException: Connection refused 异常
+                socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            }else {
+                socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
+            }
             Log.i("BT","已创建SOCKET");
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,21 +174,21 @@ public class Bluetooth {
             Log.i("BT","已连接");
         } catch (IOException e) {
             e.printStackTrace();
-
-            if(!tryotherway)
-            {
-                if(e.getMessage().equals("Service discovery failed")){
-                    tryotherway = true;
-                    Log.i("BT","尝试另一种方法");
-                    closeSocket();
-                    createSocket();
-                    return connectSocket();
-                }
-            }
-            else
-            {
-                tryotherway = false;
-            }
+            closeSocket();
+//            if(!tryotherway)
+//            {
+//                if(e.getMessage().equals("Service discovery failed")){
+//                    tryotherway = true;
+//                    Log.i("BT","尝试另一种方法");
+//                    closeSocket();
+//                    createSocket();
+//                    return connectSocket();
+//                }
+//            }
+//            else
+//            {
+//                tryotherway = false;
+//            }
         }
 
         return success;
